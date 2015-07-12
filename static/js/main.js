@@ -1,41 +1,42 @@
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create });
+var game = new Phaser.Game(800, 640, Phaser.AUTO, 'game-js', { preload: preload, create: create, update:update });
 
-var text;
-var counter = 0;
-
-function preload () {
-
-    //  You can fill the preloader with as many assets as your game requires
-
-    //  Here we are loading an image. The first parameter is the unique
-    //  string by which we'll identify the image later in our code.
-
-    //  The second parameter is the URL of the image (relative)
-    game.load.image('einstein', 'static/bunny.png');
-
+function preload() {
+    // Preload game assets
+    game.load.image('grass', 'static/assets/grass.png');
+    game.load.image('tree', 'static/assets/tree.png');
 }
 
 function create() {
+    // Create the game tiles
+    tiles = game.add.group();
+    var spritePx = 16; // Sprite pixel size
+    var spriteZoom = 2;
+    var treeProb = .2;
 
-    //  This creates a simple sprite that is using our loaded image and
-    //  displays it on-screen and assign it to a variable
-    var image = game.add.sprite(game.world.centerX, game.world.centerY, 'einstein');
+    var rows = game.height/(spritePx * spriteZoom);
+    var columns = game.width/(spritePx * spriteZoom);
 
-    //  Moves the image anchor to the middle, so it centers inside the game properly
-    image.anchor.set(0.5);
+    var grassTiles = game.add.group();
+    var treeTiles = game.add.group();
 
-    //  Enables all kind of input actions on this image (click, etc)
-    image.inputEnabled = true;
-
-    text = game.add.text(250, 16, '', { fill: '#ffffff' });
-
-    image.events.onInputDown.add(listener, this);
-
+    for (var r=0;r<rows;r++){
+        for (var c=0;c<columns;c++){
+            var tileType = 'grass';
+            if (Math.random() <= treeProb){
+                var tileType = 'tree';
+            }
+            var tile = tiles.create(c*spritePx*spriteZoom, r*spritePx*spriteZoom, tileType);
+            tile.age = 0;
+            tile.scale.setTo(spriteZoom, spriteZoom);
+        }
+    }
 }
 
-function listener () {
-
-    counter++;
-    text.text = "You clicked " + counter + " times!";
-
+function update() {
+    for (var i=0;i<tiles.children.length;i++){
+        tiles.children[i].age ++;
+        if (tiles.children[i].age == 10){
+            var text = game.add.text(16, 16, "junk");
+        }
+    }
 }
